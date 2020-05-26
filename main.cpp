@@ -7,7 +7,7 @@ int what_to_do = 0;
 int x=0,y=600,block_width = 100, block_height = 100;
 int padding = 20;
 int open_transaction_width = 100, open_transaction_height = 100;
-int no_of_blocks = 0, no_of_ot = 0;
+int no_of_blocks = 1, no_of_ot = 0;
 int transactions[100];
 
 //Declaring fonts for display
@@ -77,18 +77,13 @@ void display_blocks()
     intro(400, 900);
     RenderString(0, y+125, "Blockchain", GLUT_BITMAP_8_BY_13);
 
-    if (no_of_blocks == 0)
-    {
-        RenderString(0, y + 100, "No blocks! Use the menu or press 'm' to mine block!", GLUT_BITMAP_8_BY_13);
-        return;
-    }
-
     if (no_of_blocks >= 9)
     {
         block_width = 50;
         block_height = 50;
         block_font = GLUT_BITMAP_TIMES_ROMAN_10;
     }
+
 
     for (int i = 1; i<= no_of_blocks; i++)
     {
@@ -104,8 +99,15 @@ void display_blocks()
             str[2] = '\0';
         }
         draw_polygon(tempx, y, block_width, block_height);
-        RenderString(tempx, y + (block_height/2), "Block", block_font);
-        RenderString(tempx + block_width - 20, y + (block_height/2), str ,block_font);
+        if (i == 1)
+        {
+            RenderString(tempx, y + (block_height/2), "Genesis Block", block_font);
+        }
+        else
+        {
+            RenderString(tempx, y + (block_height/2), "Block", block_font);
+            RenderString(tempx + block_width - 20, y + (block_height/2), str ,block_font);
+        }
         draw_line(tempx + block_width, y+(block_height/2), tempx + block_width + padding, y+(block_height/2));
         tempx = tempx + block_width + padding;
     }
@@ -220,6 +222,22 @@ void display()
     }
     if (what_to_do == 3)
     {
+        for (int i = 1; i <= no_of_blocks; i++)
+        {
+            transactions[i] = 0;
+        }
+        no_of_blocks = 1;
+        no_of_ot = 0;
+        block_width = 100;
+        block_height = 100;
+        open_transaction_width = 100;
+        open_transaction_height = 100;
+        block_font = GLUT_BITMAP_TIMES_ROMAN_24;
+        open_transaction_font = GLUT_BITMAP_TIMES_ROMAN_24;
+        what_to_do = 0;
+    }
+    if (what_to_do == 4)
+    {
         int win = glutGetWindow();
         glutDestroyWindow(win);
         return;
@@ -244,6 +262,10 @@ void blockchain_menu(int option)
     {
         what_to_do = 3;
     }
+    if (option == 4)
+    {
+        what_to_do = 4;
+    }
 }
 
 //Keyboard listener
@@ -258,9 +280,13 @@ void keys(unsigned char key, int x, int y)
     {
         what_to_do = 2;
     }
-    if ((int)key == 27)
+    if (key == 'r')
     {
         what_to_do = 3;
+    }
+    if ((int)key == 27)
+    {
+        what_to_do = 4;
     }
     display();
 }
@@ -290,9 +316,10 @@ int main(int argc, char **argv)
     glutDisplayFunc(display);
 
     glutCreateMenu(blockchain_menu);
-    glutAddMenuEntry("1.Add a block(Key m)", 1);
-    glutAddMenuEntry("2.Add a transaction(Key t)", 2);
-    glutAddMenuEntry("3.Exit Simulation(Key Esc)", 3);
+    glutAddMenuEntry("1. Add a block(Key m)", 1);
+    glutAddMenuEntry("2. Add a transaction(Key t)", 2);
+    glutAddMenuEntry("3. Reset(Key r)", 3);
+    glutAddMenuEntry("4. Exit Simulation(Key Esc)", 4);
     glutAttachMenu(GLUT_RIGHT_BUTTON);
 
     glutKeyboardFunc(keys);
