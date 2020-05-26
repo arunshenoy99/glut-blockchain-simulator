@@ -9,6 +9,7 @@ int padding = 20;
 int open_transaction_width = 100, open_transaction_height = 100;
 int no_of_blocks = 1, no_of_ot = 0;
 int transactions[100];
+int clicked_block = 0, clicked_ot = 0;
 
 //Declaring fonts for display
 
@@ -190,6 +191,9 @@ void add_block()
     no_of_blocks += 1;
     transactions[no_of_blocks] = no_of_ot;
     no_of_ot = 0;
+    open_transaction_width = 100;
+    open_transaction_height = 100;
+    open_transaction_font = GLUT_BITMAP_TIMES_ROMAN_24;
 }
 
 
@@ -291,6 +295,15 @@ void keys(unsigned char key, int x, int y)
     display();
 }
 
+//Mouse Listener
+void mouse(int btn, int state, int x, int y)
+{
+    if (btn == GLUT_LEFT_BUTTON && state == GLUT_UP)
+    {
+        clicked_block = x / 120;
+    }
+}
+
 
 //Initialize graphics system
 
@@ -302,7 +315,6 @@ void init()
     gluOrtho2D(0.0, 1000.0, 0.0, 1000.0);
     glMatrixMode(GL_MODELVIEW);
 }
-
 
 int main(int argc, char **argv)
 {
@@ -316,12 +328,13 @@ int main(int argc, char **argv)
     glutDisplayFunc(display);
 
     glutCreateMenu(blockchain_menu);
-    glutAddMenuEntry("1. Add a block(Key m)", 1);
+    glutAddMenuEntry("1. Mine a block(Key m)", 1);
     glutAddMenuEntry("2. Add a transaction(Key t)", 2);
     glutAddMenuEntry("3. Reset(Key r)", 3);
     glutAddMenuEntry("4. Exit Simulation(Key Esc)", 4);
     glutAttachMenu(GLUT_RIGHT_BUTTON);
 
+    glutMouseFunc(mouse);
     glutKeyboardFunc(keys);
 
     glutMainLoop();
