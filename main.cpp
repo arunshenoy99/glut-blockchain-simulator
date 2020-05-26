@@ -159,9 +159,8 @@ void display_open_transactions()
             str[2] = '\0';
         }
         draw_polygon(tempx, oty, open_transaction_width, open_transaction_height);
-        RenderString(tempx, oty + (open_transaction_height/2),"Transaction",open_transaction_font);
+        RenderString(tempx, oty + (open_transaction_height/2), "Transaction", open_transaction_font);
         RenderString(tempx + open_transaction_width - 10, oty + (open_transaction_height/2), str ,open_transaction_font);
-        draw_line(tempx + open_transaction_width, oty+(open_transaction_height/2), tempx + open_transaction_width + padding, oty+(open_transaction_height/2));
         tempx = tempx + open_transaction_width + padding;
     }
     if (no_of_ot <= 9)
