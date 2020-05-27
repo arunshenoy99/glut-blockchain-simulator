@@ -56,6 +56,19 @@ void RenderString(float x, float y, char* string, void* font)
   }
 }
 
+void to_string_digit(char str[], int digit)
+{
+    str[0] = digit + '0';
+    str[1] = '\0';
+}
+
+void to_string_digits(char str[], int digits)
+{
+    str[0] = digits/10 + '0';
+    str[1] = digits%10 + '0';
+    str[2] = '\0';
+}
+
 //Introduction and our names
 
 void intro(int x, int y)
@@ -90,14 +103,11 @@ void display_blocks()
     {
         if (i <= 9)
         {
-            str[0] = i + '0';
-            str[1] = '\0';
+            to_string_digit(str, i);
         }
         else
         {
-            str[0] = i/10 + '0';
-            str[1] = i%10 + '0';
-            str[2] = '\0';
+            to_string_digits(str, i);
         }
         draw_polygon(tempx, y, block_width, block_height);
         if (i == 1)
@@ -115,14 +125,11 @@ void display_blocks()
 
     if (no_of_blocks <= 9)
     {
-        str[0] = no_of_blocks + '0';
-        str[1] = '\0';
+        to_string_digit(str, no_of_blocks);
     }
     else
     {
-        str[0] = no_of_blocks/10 + '0';
-        str[1] = no_of_blocks%10 + '0';
-        str[2] = '\0';
+        to_string_digits(str, no_of_blocks);
     }
 
     RenderString(0, y - 25, "No of blocks: " , GLUT_BITMAP_8_BY_13);
@@ -152,14 +159,11 @@ void display_open_transactions()
     {
         if (i <= 9)
         {
-            str[0] = i + '0';
-            str[1] = '\0';
+            to_string_digit(str, i);
         }
         else
         {
-            str[0] = i/10 + '0';
-            str[1] = i%10 + '0';
-            str[2] = '\0';
+            to_string_digits(str, i);
         }
         draw_polygon(tempx, oty, open_transaction_width, open_transaction_height);
         RenderString(tempx, oty + (open_transaction_height/2), "Transaction", open_transaction_font);
@@ -168,14 +172,11 @@ void display_open_transactions()
     }
     if (no_of_ot <= 9)
     {
-        str[0] = no_of_ot + '0';
-        str[1] = '\0';
+        to_string_digit(str, no_of_ot);
     }
     else
     {
-        str[0] = no_of_ot/10 + '0';
-        str[1] = no_of_ot%10 + '0';
-        str[2] = '\0';
+        to_string_digits(str, no_of_ot);
     }
     RenderString(0, oty - 25, "No of open transactions: " , GLUT_BITMAP_8_BY_13);
     RenderString(150, oty - 25, str, GLUT_BITMAP_8_BY_13);
