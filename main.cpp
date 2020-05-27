@@ -73,7 +73,7 @@ void to_string_digits(char str[], int digits)
 
 void intro(int x, int y)
 {
-    RenderString(x, y, "Welcome to blockchain simulation", GLUT_BITMAP_TIMES_ROMAN_24);
+    RenderString(x, y, "Welcome to Blockchain Simulator", GLUT_BITMAP_TIMES_ROMAN_24);
     RenderString(x, y-50, "Right Click to view the menu", GLUT_BITMAP_9_BY_15);
     RenderString(x, 150, "A SIMULATION BY", GLUT_BITMAP_9_BY_15);
     RenderString(x, 100, "ARUN R SHENOY 1BY17CS032", GLUT_BITMAP_9_BY_15);
@@ -88,13 +88,12 @@ void display_blocks()
     int tempx = 0;
     char str[3];
 
-    intro(400, 900);
-    RenderString(0, y+125, "Blockchain", GLUT_BITMAP_8_BY_13);
+    RenderString(0, y+125, "Blockchain(Click on any block to view it's contents)", GLUT_BITMAP_8_BY_13);
 
     if (no_of_blocks >= 9)
     {
         block_width = 50;
-        block_height = 50;
+        block_height = 100;
         block_font = GLUT_BITMAP_TIMES_ROMAN_10;
     }
 
@@ -140,14 +139,14 @@ void display_blocks()
 
 void display_open_transactions()
 {
-    int oty = y - 200;
+    int oty = y - 300;
     RenderString(0, oty + 125, "Open Transactions", GLUT_BITMAP_8_BY_13);
     int tempx = 0;
     char str[3];
     if (no_of_ot >= 9)
     {
         open_transaction_width = 50;
-        open_transaction_height = 50;
+        open_transaction_height = 100;
         open_transaction_font = GLUT_BITMAP_TIMES_ROMAN_10;
     }
     if (no_of_ot == 0)
@@ -183,6 +182,47 @@ void display_open_transactions()
 
 }
 
+void display_block()
+{
+    char block[3];
+    char previous_block[3];
+    char t[3];
+    draw_polygon(300, 500, 300, 300);
+
+    if (clicked_block <= 9)
+    {
+        to_string_digit(block, clicked_block);
+        to_string_digit(previous_block, clicked_block - 1);
+    }
+    else
+    {
+        to_string_digits(block, clicked_block);
+        if ((clicked_block - 1) == 9)
+        {
+            to_string_digit(previous_block, clicked_block - 1);
+        }
+        else
+        {
+            to_string_digits(previous_block, clicked_block - 1);
+        }
+    }
+    if (transactions[clicked_block] <= 9)
+    {
+        to_string_digit(t, transactions[clicked_block]);
+    }
+    else
+    {
+        to_string_digits(t, transactions[clicked_block]);
+    }
+    RenderString(325, 750, "Index: ", GLUT_BITMAP_TIMES_ROMAN_24);
+    RenderString(375, 750, block, GLUT_BITMAP_TIMES_ROMAN_24);
+    RenderString(325, 725, "Previous Hash: ", GLUT_BITMAP_TIMES_ROMAN_24);
+    RenderString(425, 725, previous_block, GLUT_BITMAP_TIMES_ROMAN_24);
+    RenderString(325, 700, "Transactions: ", GLUT_BITMAP_TIMES_ROMAN_24);
+    RenderString(425, 700, t, GLUT_BITMAP_TIMES_ROMAN_24);
+    RenderString(300, 475, "Press B to go back !", GLUT_BITMAP_8_BY_13);
+}
+
 //Add a new block
 
 void add_block()
@@ -204,6 +244,8 @@ void display()
 {
     glutFullScreen();
     glClear(GL_COLOR_BUFFER_BIT);
+
+    intro(400, 900);
 
     if (what_to_do == 0)
     {
@@ -246,6 +288,19 @@ void display()
         int win = glutGetWindow();
         glutDestroyWindow(win);
         return;
+    }
+    if (what_to_do == 5)
+    {
+        if (clicked_block > no_of_blocks)
+        {
+            display_blocks();
+            display_open_transactions();
+            what_to_do = 0;
+        }
+        else
+        {
+            display_block();
+        }
     }
     glutPostRedisplay();
     glutSwapBuffers();
@@ -293,15 +348,28 @@ void keys(unsigned char key, int x, int y)
     {
         what_to_do = 4;
     }
+    if (key == 'b')
+    {
+        what_to_do = 0;
+    }
     display();
 }
 
 //Mouse Listener
 void mouse(int btn, int state, int x, int y)
 {
-    if (btn == GLUT_LEFT_BUTTON && state == GLUT_UP)
+    if (btn == GLUT_LEFT_BUTTON && state == GLUT_UP && y >= 1000 - (::y + block_height) && y <= 1000 - ::y )
     {
-        clicked_block = x / 120;
+       if (no_of_blocks < 9)
+       {
+            clicked_block = ((x) / (184)) + 1;
+            what_to_do = 5;
+       }
+       else
+       {
+            clicked_block = ((x) / (105)) + 1;
+            what_to_do = 5;
+       }
     }
 }
 
@@ -323,7 +391,7 @@ int main(int argc, char **argv)
     glutInitDisplayMode(GLUT_DOUBLE|GLUT_RGB);
 
     glutInitWindowPosition(0, 0);
-    glutCreateWindow("Blockchain Simulation");
+    glutCreateWindow("BLOCKCHAIN SIMULATION");
 
     init();
     glutDisplayFunc(display);
