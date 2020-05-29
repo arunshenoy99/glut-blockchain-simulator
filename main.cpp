@@ -184,10 +184,12 @@ void display_open_transactions()
 
 void display_block()
 {
+    int x1 = 350;
+    int y1 = 400;
     char block[3];
     char previous_block[3];
     char t[3];
-    draw_polygon(300, 500, 300, 300);
+    draw_polygon(x1, y1, 300, 300);
 
     if (clicked_block <= 9)
     {
@@ -214,13 +216,38 @@ void display_block()
     {
         to_string_digits(t, transactions[clicked_block]);
     }
-    RenderString(325, 750, "Index: ", GLUT_BITMAP_TIMES_ROMAN_24);
-    RenderString(375, 750, block, GLUT_BITMAP_TIMES_ROMAN_24);
-    RenderString(325, 725, "Previous Hash: ", GLUT_BITMAP_TIMES_ROMAN_24);
-    RenderString(425, 725, previous_block, GLUT_BITMAP_TIMES_ROMAN_24);
-    RenderString(325, 700, "Transactions: ", GLUT_BITMAP_TIMES_ROMAN_24);
-    RenderString(425, 700, t, GLUT_BITMAP_TIMES_ROMAN_24);
-    RenderString(300, 475, "Press B to go back !", GLUT_BITMAP_8_BY_13);
+    RenderString(x1 + 25, y1 + 250, "Index: ", GLUT_BITMAP_TIMES_ROMAN_24);
+    RenderString(x1 + 75, y1 + 250, block, GLUT_BITMAP_TIMES_ROMAN_24);
+    RenderString(x1 + 25, y1 + 225, "Previous Hash: ", GLUT_BITMAP_TIMES_ROMAN_24);
+    RenderString(x1 + 125, y1 + 225, previous_block, GLUT_BITMAP_TIMES_ROMAN_24);
+    RenderString(x1 + 25, y1 + 200, "Transactions: ", GLUT_BITMAP_TIMES_ROMAN_24);
+    RenderString(x1 + 125, y1 + 200, t, GLUT_BITMAP_TIMES_ROMAN_24);
+    RenderString(x1, y1 - 25, "Press B or Esc to go back !", GLUT_BITMAP_8_BY_13);
+}
+
+void display_open_transaction()
+{
+    int x1 = 350;
+    int y1 = 400;
+    char ot[3];
+    draw_polygon(x1, y1, 300, 300);
+    if (clicked_ot <= 9)
+    {
+        to_string_digit(ot, clicked_ot);
+    }
+    else
+    {
+        to_string_digits(ot, clicked_ot);
+    }
+    RenderString(x1 + 25, y1 + 250, "Transaction:", GLUT_BITMAP_TIMES_ROMAN_24);
+    RenderString(x1 + 125, y1 + 250, ot, GLUT_BITMAP_TIMES_ROMAN_24);
+    RenderString(x1 + 25, y1 + 225, "Sender: ", GLUT_BITMAP_TIMES_ROMAN_24);
+    RenderString(x1 + 125, y1 + 225, ot, GLUT_BITMAP_TIMES_ROMAN_24);
+    RenderString(x1 + 25, y1 + 200, "Recipient: ", GLUT_BITMAP_TIMES_ROMAN_24);
+    RenderString(x1 + 125, y1 + 200, ot, GLUT_BITMAP_TIMES_ROMAN_24);
+    RenderString(x1 + 25, y1 + 175, "Amount: ", GLUT_BITMAP_TIMES_ROMAN_24);
+    RenderString(x1 + 125, y1 + 175, "10.0", GLUT_BITMAP_TIMES_ROMAN_24);
+    RenderString(x1, y1 - 25, "Press B or Esc to go back !", GLUT_BITMAP_8_BY_13);
 }
 
 //Add a new block
@@ -302,6 +329,19 @@ void display()
             display_block();
         }
     }
+    if (what_to_do == 6)
+    {
+        if (clicked_ot > no_of_ot)
+        {
+            display_blocks();
+            display_open_transactions();
+            what_to_do = 0;
+        }
+        else
+        {
+            display_open_transaction();
+        }
+    }
     glutPostRedisplay();
     glutSwapBuffers();
 }
@@ -346,7 +386,14 @@ void keys(unsigned char key, int x, int y)
     }
     if ((int)key == 27)
     {
-        what_to_do = 4;
+        if (what_to_do == 5 || what_to_do == 6)
+        {
+            what_to_do = 0;
+        }
+        else
+        {
+            what_to_do = 4;
+        }
     }
     if (key == 'b')
     {
@@ -370,6 +417,19 @@ void mouse(int btn, int state, int x, int y)
             clicked_block = ((x) / (105)) + 1;
             what_to_do = 5;
        }
+    }
+    if (btn == GLUT_LEFT_BUTTON && state == GLUT_UP && y >= 1000 - (::y - 200 + open_transaction_height) && y <= 1000 - (::y - 200))
+    {
+        if (no_of_ot < 9)
+        {
+            clicked_ot = ((x) / (184)) + 1;
+            what_to_do = 6;
+        }
+        else
+        {
+            clicked_ot = ((x) / 105) + 1;
+            what_to_do = 6;
+        }
     }
 }
 
