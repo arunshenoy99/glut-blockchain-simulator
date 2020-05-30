@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1590859875 source:c:\users\arun\desktop\work\cg\mini\main.cpp
+1590861585 source:c:\users\arun\desktop\work\cg\mini\main.cpp
 	<GL/glut.h>
 	<stdio.h>
 	<string.h>
