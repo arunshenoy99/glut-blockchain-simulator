@@ -182,10 +182,54 @@ void display_open_transactions()
 
 }
 
+void display_block_transactions()
+{
+    int oty = 300;
+    int tempx = 0;
+    char str[3];
+    RenderString(0, oty + 125, "Transactions in block", GLUT_BITMAP_8_BY_13);
+    if (transactions[clicked_block] >= 9)
+    {
+        open_transaction_width = 50;
+        open_transaction_height = 100;
+        open_transaction_font = GLUT_BITMAP_TIMES_ROMAN_10;
+    }
+    if (transactions[clicked_block] == 0)
+    {
+        RenderString(0, oty + 100 , "Block has no transactions !", GLUT_BITMAP_8_BY_13);
+        return;
+    }
+    for (int i = 1; i<= transactions[clicked_block]; i++)
+    {
+        if (i <= 9)
+        {
+            to_string_digit(str, i);
+        }
+        else
+        {
+            to_string_digits(str, i);
+        }
+        draw_polygon(tempx, oty, open_transaction_width, open_transaction_height);
+        RenderString(tempx, oty + (open_transaction_height/2), "Transaction", open_transaction_font);
+        RenderString(tempx + open_transaction_width - 10, oty + (open_transaction_height/2), str ,open_transaction_font);
+        tempx = tempx + open_transaction_width + padding;
+    }
+    if (transactions[clicked_block] <= 9)
+    {
+        to_string_digit(str, transactions[clicked_block]);
+    }
+    else
+    {
+        to_string_digits(str, transactions[clicked_block]);
+    }
+    RenderString(0, oty - 25, "No of transactions: " , GLUT_BITMAP_8_BY_13);
+    RenderString(150, oty - 25, str, GLUT_BITMAP_8_BY_13);
+}
+
 void display_block()
 {
     int x1 = 350;
-    int y1 = 400;
+    int y1 = 500;
     char block[3];
     char previous_block[3];
     char t[3];
@@ -223,12 +267,14 @@ void display_block()
     RenderString(x1 + 25, y1 + 200, "Transactions: ", GLUT_BITMAP_TIMES_ROMAN_24);
     RenderString(x1 + 125, y1 + 200, t, GLUT_BITMAP_TIMES_ROMAN_24);
     RenderString(x1, y1 - 25, "Press B or Esc to go back !", GLUT_BITMAP_8_BY_13);
+    display_block_transactions();
 }
+
 
 void display_open_transaction()
 {
     int x1 = 350;
-    int y1 = 400;
+    int y1 = 500;
     char ot[3];
     draw_polygon(x1, y1, 300, 300);
     if (clicked_ot <= 9)
@@ -342,6 +388,17 @@ void display()
             display_open_transaction();
         }
     }
+    if (what_to_do == 7)
+    {
+        if (clicked_ot > transactions[clicked_block])
+        {
+            what_to_do = 5;
+        }
+        else
+        {
+            display_open_transaction();
+        }
+    }
     glutPostRedisplay();
     glutSwapBuffers();
 }
@@ -390,6 +447,10 @@ void keys(unsigned char key, int x, int y)
         {
             what_to_do = 0;
         }
+        else if (what_to_do == 7)
+        {
+            what_to_do = 5;
+        }
         else
         {
             what_to_do = 4;
@@ -397,7 +458,14 @@ void keys(unsigned char key, int x, int y)
     }
     if (key == 'b')
     {
-        what_to_do = 0;
+        if (what_to_do == 7)
+        {
+            what_to_do = 5;
+        }
+        else
+        {
+            what_to_do = 0;
+        }
     }
     display();
 }
@@ -405,7 +473,7 @@ void keys(unsigned char key, int x, int y)
 //Mouse Listener
 void mouse(int btn, int state, int x, int y)
 {
-    if (btn == GLUT_LEFT_BUTTON && state == GLUT_UP && y >= 1000 - (::y + block_height) && y <= 1000 - ::y )
+    if (btn == GLUT_LEFT_BUTTON && state == GLUT_UP && y >= 1000 - (::y + block_height) && y <= 1000 - ::y && what_to_do == 0)
     {
        if (no_of_blocks < 9)
        {
@@ -418,7 +486,7 @@ void mouse(int btn, int state, int x, int y)
             what_to_do = 5;
        }
     }
-    if (btn == GLUT_LEFT_BUTTON && state == GLUT_UP && y >= 1000 - (::y - 200 + open_transaction_height) && y <= 1000 - (::y - 200))
+    if (btn == GLUT_LEFT_BUTTON && state == GLUT_UP && y >= 1000 - (::y - 200 + open_transaction_height) && y <= 1000 - (::y - 200) && what_to_do == 0)
     {
         if (no_of_ot < 9)
         {
@@ -429,6 +497,19 @@ void mouse(int btn, int state, int x, int y)
         {
             clicked_ot = ((x) / 105) + 1;
             what_to_do = 6;
+        }
+    }
+    if (btn == GLUT_LEFT_BUTTON && state == GLUT_UP && y >= 1000 - (::y - 200 + open_transaction_height) && y <= 1000 - (::y - 200) && what_to_do == 5)
+    {
+        if (transactions[clicked_block] < 9)
+        {
+            clicked_ot = ((x) / (184)) + 1;
+            what_to_do = 7;
+        }
+        else
+        {
+            clicked_ot = ((x) / 105) + 1;
+            what_to_do = 7;
         }
     }
 }
