@@ -145,7 +145,7 @@ void display_blocks()
         {
             to_string_digits(str, i);
         }
-        if (i == manip_block + 1 || i == manip_block)
+        if (i >= manip_block && manip_block != -2)
         {
             draw_polygon(tempx, y, block_width, block_height, 0.0, 0.0, 0.0);
         }
@@ -319,7 +319,7 @@ void display_block()
         to_string_digits(t, transactions[clicked_block]);
     }
 
-    if (manip_block == clicked_block || manip_block + 1 == clicked_block)
+    if (clicked_block >= manip_block && manip_block != -2)
     {
         draw_polygon(x1, y1, 300, 300, 0, 0, 0);
     }
@@ -335,7 +335,7 @@ void display_block()
     RenderString(x1 + 25, y1 + 250, "Index: ", GLUT_BITMAP_TIMES_ROMAN_24);
     RenderString(x1 + 75, y1 + 250, block, GLUT_BITMAP_TIMES_ROMAN_24);
     RenderString(x1 + 25, y1 + 225, "Previous Hash: ", GLUT_BITMAP_TIMES_ROMAN_24);
-    if (clicked_block == manip_block + 1)
+    if (clicked_block > manip_block && manip_block != -2)
     {
         RenderString(x1 + 125, y1 + 225, "Invalid", GLUT_BITMAP_TIMES_ROMAN_24);
     }
