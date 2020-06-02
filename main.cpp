@@ -416,7 +416,6 @@ void display()
 {
     glutFullScreen();
     glClear(GL_COLOR_BUFFER_BIT);
-    glLoadIdentity();
 
     //Display Introduction
 
@@ -590,7 +589,7 @@ void keys(unsigned char key, int x, int y)
     {
         what_to_do = 0;
     }
-    if (key == 'm')
+    if (key == 'm' && what_to_do == 0)
     {
         if (what_to_do == 5)
         {
@@ -628,7 +627,7 @@ void keys(unsigned char key, int x, int y)
             what_to_do = 4;
         }
     }
-    if (key == 'b')
+    if (key == 'b' && what_to_do != -1)
     {
         if (what_to_do == 7)
         {
