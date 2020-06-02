@@ -10,7 +10,8 @@ int padding = 20;
 int open_transaction_width = 100, open_transaction_height = 100;
 int no_of_blocks = 1, no_of_ot = 0;
 int transactions[100];
-int clicked_block = 0, clicked_ot = 0;
+int clicked_block = 0, clicked_ot = 0, manip_block = -2, temp_transac = 0;
+unsigned int d = 0;
 
 //Declaring fonts for display
 
@@ -20,9 +21,9 @@ void *open_transaction_font = GLUT_BITMAP_TIMES_ROMAN_24;
 
 //Draw block or open transaction
 
-void draw_polygon(int x, int y, int width, int height)
+void draw_polygon(int x, int y, int width, int height, float r = 1.0, float g = 0.0, float b = 0.0)
 {
-    glColor3f(1.0, 0.0, 0.0);
+    glColor3f(r, g, b);
     glBegin(GL_POLYGON);
         glVertex2f(x, y);
         glVertex2f(x+width, y);
@@ -42,11 +43,16 @@ void draw_line(int x1, int y1, int x2, int y2)
     glEnd();
 }
 
-
+void delay(unsigned int mseconds)
+{
+    clock_t goal = mseconds + clock();
+    while (goal > clock())
+        ;
+}
 
 //Render bitmap characters
 
-void RenderString(float x, float y, char* string, void* font, float r = 1, float g = 1, float b = 1, float d = 0)
+void RenderString(float x, float y, char* string, void* font, float r = 1, float g = 1, float b = 1)
 {
   char *c;
 
@@ -57,6 +63,25 @@ void RenderString(float x, float y, char* string, void* font, float r = 1, float
   {
       glutBitmapCharacter(font, *c);
   }
+}
+
+//Stroke font for Intro
+
+void drawStrokeText(int x, int y, char*string, float w = 1, float r = 1, float g = 1, float b = 1, float sx = 0.3f, float sy = 0.3f)
+{
+    int z = 0;
+    char *c;
+    glColor3f(r, g, b);
+    glLineWidth(w);
+    glPushMatrix();
+    glTranslatef(x, y+8,z);
+    glScalef(sx, sy , z);
+
+    for (c=string; *c != '\0'; c++)
+    {
+        glutStrokeCharacter(GLUT_STROKE_ROMAN , *c);
+    }
+    glPopMatrix();
 }
 
 //Convert single digit to string
@@ -80,16 +105,13 @@ void to_string_digits(char str[], int digits)
 
 void intro(int x, int y)
 {
-    RenderString(400, 950, "Intro ", GLUT_BITMAP_HELVETICA_18);
-    RenderString(x, 800, "Computer Graphics Mini Project", GLUT_BITMAP_TIMES_ROMAN_24);
-    RenderString(x, 750, "Simulator for various block chain operations", GLUT_BITMAP_TIMES_ROMAN_24);
-    RenderString(x, y - 50, "What is a block chain? ", GLUT_BITMAP_9_BY_15);
-    RenderString(0, y - 100, "A block-chain, originally block chain, is a growing list of records, called blocks, that are linked using cryptography. Each block contains a cryptographic hash of the previous block, a", GLUT_BITMAP_8_BY_13);
-    RenderString(0, y - 125, "timestamp, and transaction data.", GLUT_BITMAP_8_BY_13);
-    RenderString(x, y - 200, "Press N to create a new simulation instance", GLUT_BITMAP_9_BY_15, 0, 1, 0, 0.2);
-    RenderString(400, 150, "A SIMULATOR BY", GLUT_BITMAP_9_BY_15);
-    RenderString(400, 100, "ARUN R SHENOY 1BY17CS032", GLUT_BITMAP_9_BY_15);
-    RenderString(400, 50, "CHARAN KALSHETTY 1BY17CS041", GLUT_BITMAP_9_BY_15);
+    RenderString(x + 50, y + 350, "Intro ", GLUT_BITMAP_HELVETICA_18);
+    drawStrokeText(x - 250, y + 200, "COMPUTER GRAPHICS LAB MINI PROJECT", 2);
+    drawStrokeText(x - 100, y, "BLOCKCHAIN SIMULATOR", 3);
+    drawStrokeText(x - 100, y - 100, "Press N to create a new simulation instance", 2, 0, 1, 0, 0.15f, 0.15f);
+    drawStrokeText(x + 50, y - 400, "A SIMULATOR BY", 2, 1, 1, 1, 0.2f, 0.2f);
+    drawStrokeText(x - 300, y - 500, "ARUN R SHENOY 1BY17CS032", 2, 1, 1, 1, 0.2f, 0.2f);
+    drawStrokeText(x + 150, y - 500, "CHARAN KALSHETTY 1BY17CS041", 2, 1, 1, 1, 0.2f, 0.2f);
 }
 
 
@@ -123,7 +145,14 @@ void display_blocks()
         {
             to_string_digits(str, i);
         }
-        draw_polygon(tempx, y, block_width, block_height);
+        if (i == manip_block + 1 || i == manip_block)
+        {
+            draw_polygon(tempx, y, block_width, block_height, 0.0, 0.0, 0.0);
+        }
+        else
+        {
+            draw_polygon(tempx, y, block_width, block_height);
+        }
         if (i == 1)
         {
             RenderString(tempx, y + (block_height/2), "Genesis Block", block_font);
@@ -148,6 +177,10 @@ void display_blocks()
 
     RenderString(0, y - 25, "No of blocks: " , GLUT_BITMAP_8_BY_13, 0, 1, 0);
     RenderString(150, y - 25, str, GLUT_BITMAP_8_BY_13, 0, 1, 0);
+    if (manip_block != -2)
+    {
+        RenderString(0, y - 50, "Blockchain is invalid please press C to contact peer nodes and replace it", GLUT_BITMAP_8_BY_13, 1, 0, 0);
+    }
     RenderString(400, 150, "A SIMULATOR BY", GLUT_BITMAP_9_BY_15);
     RenderString(400, 100, "ARUN R SHENOY 1BY17CS032", GLUT_BITMAP_9_BY_15);
     RenderString(400, 50, "CHARAN KALSHETTY 1BY17CS041", GLUT_BITMAP_9_BY_15);
@@ -286,7 +319,14 @@ void display_block()
         to_string_digits(t, transactions[clicked_block]);
     }
 
-    draw_polygon(x1, y1, 300, 300);
+    if (manip_block == clicked_block || manip_block + 1 == clicked_block)
+    {
+        draw_polygon(x1, y1, 300, 300, 0, 0, 0);
+    }
+    else
+    {
+        draw_polygon(x1, y1, 300, 300);
+    }
 
     RenderString(400, 900, "Viewing Block", GLUT_BITMAP_TIMES_ROMAN_24);
     RenderString(500, 900, block, GLUT_BITMAP_TIMES_ROMAN_24);
@@ -295,9 +335,17 @@ void display_block()
     RenderString(x1 + 25, y1 + 250, "Index: ", GLUT_BITMAP_TIMES_ROMAN_24);
     RenderString(x1 + 75, y1 + 250, block, GLUT_BITMAP_TIMES_ROMAN_24);
     RenderString(x1 + 25, y1 + 225, "Previous Hash: ", GLUT_BITMAP_TIMES_ROMAN_24);
-    RenderString(x1 + 125, y1 + 225, previous_block, GLUT_BITMAP_TIMES_ROMAN_24);
+    if (clicked_block == manip_block + 1)
+    {
+        RenderString(x1 + 125, y1 + 225, "Invalid", GLUT_BITMAP_TIMES_ROMAN_24);
+    }
+    else
+    {
+        RenderString(x1 + 125, y1 + 225, previous_block, GLUT_BITMAP_TIMES_ROMAN_24);
+    }
     RenderString(x1 + 25, y1 + 200, "Transactions: ", GLUT_BITMAP_TIMES_ROMAN_24);
     RenderString(x1 + 125, y1 + 200, t, GLUT_BITMAP_TIMES_ROMAN_24);
+    RenderString(x1, y1 - 50, "Press M to manipulate the block", GLUT_BITMAP_8_BY_13);
     RenderString(400, 150, "A SIMULATOR BY", GLUT_BITMAP_9_BY_15);
     RenderString(400, 100, "ARUN R SHENOY 1BY17CS032", GLUT_BITMAP_9_BY_15);
     RenderString(400, 50, "CHARAN KALSHETTY 1BY17CS041", GLUT_BITMAP_9_BY_15);
@@ -368,33 +416,48 @@ void display()
 {
     glutFullScreen();
     glClear(GL_COLOR_BUFFER_BIT);
+    glLoadIdentity();
 
+    //Display Introduction
 
     if (what_to_do == -1)
     {
         intro(350, 600);
     }
 
+    //Display first simulation instance
+
     if (what_to_do == 0)
     {
         display_blocks();
         display_open_transactions();
     }
+
+    //Mine a block
+
     if (what_to_do == 1)
     {
+        if (manip_block != -2)
+        {
+            what_to_do = 0;
+            return;
+        }
         add_block();
-        display_blocks();
         what_to_do = 0;
     }
+
+    //Add open transaction
+
     if (what_to_do == 2)
     {
         x = x + open_transaction_width + padding;
         no_of_ot += 1;
-        display_blocks();
-        display_open_transactions();
         what_to_do = 0;
 
     }
+
+    //Reset Simulation
+
     if (what_to_do == 3)
     {
         for (int i = 1; i <= no_of_blocks; i++)
@@ -409,20 +472,27 @@ void display()
         open_transaction_height = 100;
         block_font = GLUT_BITMAP_TIMES_ROMAN_24;
         open_transaction_font = GLUT_BITMAP_TIMES_ROMAN_24;
+        transactions[manip_block] = temp_transac;
+        manip_block = -2;
+        temp_transac = 0;
         what_to_do = 0;
     }
+
+    //Exit Simulation
+
     if (what_to_do == 4)
     {
         int win = glutGetWindow();
         glutDestroyWindow(win);
         return;
     }
+
+    //Display Block
+
     if (what_to_do == 5)
     {
         if (clicked_block > no_of_blocks)
         {
-            display_blocks();
-            display_open_transactions();
             what_to_do = 0;
         }
         else
@@ -430,12 +500,13 @@ void display()
             display_block();
         }
     }
+
+    //Display Open Transaction
+
     if (what_to_do == 6)
     {
         if (clicked_ot > no_of_ot)
         {
-            display_blocks();
-            display_open_transactions();
             what_to_do = 0;
         }
         else
@@ -443,6 +514,9 @@ void display()
             display_open_transaction();
         }
     }
+
+    //Display Block Transaction
+
     if (what_to_do == 7)
     {
         if (clicked_ot > transactions[clicked_block])
@@ -454,6 +528,34 @@ void display()
             display_open_transaction();
         }
     }
+
+    //Manipulate a block
+
+    if (what_to_do == 8)
+    {
+        if (manip_block == clicked_block || manip_block + 1 == clicked_block)
+        {
+            what_to_do = 5;
+            return;
+        }
+        manip_block = clicked_block;
+        temp_transac = transactions[manip_block];
+        transactions[manip_block] = 4;
+        what_to_do = 5;
+    }
+
+    //Fix manipulated block
+
+    if (what_to_do == 9)
+    {
+        transactions[manip_block] = temp_transac;
+        manip_block = -2;
+        temp_transac = 0;
+        what_to_do = 0;
+    }
+
+    //Display to screen
+
     glutPostRedisplay();
     glutSwapBuffers();
 }
@@ -484,19 +586,26 @@ void blockchain_menu(int option)
 
 void keys(unsigned char key, int x, int y)
 {
-    if (key == 'n')
+    if (key == 'n' && what_to_do == -1)
     {
         what_to_do = 0;
     }
     if (key == 'm')
     {
-        what_to_do = 1;
+        if (what_to_do == 5)
+        {
+            what_to_do = 8;
+        }
+        else
+        {
+            what_to_do = 1;
+        }
     }
-    if (key == 't')
+    if (key == 't' && what_to_do == 0)
     {
         what_to_do = 2;
     }
-    if (key == 'r')
+    if (key == 'r' && what_to_do == 0)
     {
         what_to_do = 3;
     }
@@ -529,6 +638,10 @@ void keys(unsigned char key, int x, int y)
         {
             what_to_do = 0;
         }
+    }
+    if (key == 'c' && what_to_do == 0)
+    {
+        what_to_do = 9;
     }
     display();
 }
