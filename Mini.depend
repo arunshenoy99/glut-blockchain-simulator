@@ -1,8 +1,7 @@
 # depslib dependency file v1.0
-1591181226 source:c:\users\arun\desktop\work\cg\mini\main.cpp
+1591204976 source:c:\users\arun\desktop\work\cg\mini\main.cpp
 	<GL/glut.h>
 	<stdio.h>
-	<string.h>
 
 1589528296 c:\program files (x86)\codeblocks\mingw\include\gl\glut.h
 	"freeglut_std.h"

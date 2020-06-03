@@ -2,7 +2,7 @@
 #include<stdio.h>
 //Declaring global variables
 
-int what_to_do = -1;
+int what_to_do = -1, temp_what_to_do = -1;
 int x=0,y=600,block_width = 100, block_height = 100;
 int padding = 20;
 int open_transaction_width = 100, open_transaction_height = 100;
@@ -84,6 +84,12 @@ void drawStrokeText(int x, int y, char*string, float w = 1, float r = 1, float g
         glutStrokeCharacter(GLUT_STROKE_ROMAN , *c);
     }
     glPopMatrix();
+}
+
+void confirm_exit()
+{
+    drawStrokeText(100, 500, "Do you really want to exit the simulation? ", 3);
+    drawStrokeText(450, 400, "Y/N", 3);
 }
 
 //Convert single digit to string
@@ -503,9 +509,7 @@ void display()
 
     if (what_to_do == 4)
     {
-        int win = glutGetWindow();
-        glutDestroyWindow(win);
-        return;
+       confirm_exit();
     }
 
     //Display Block
@@ -576,6 +580,13 @@ void display()
         what_to_do = 0;
     }
 
+    if (what_to_do == 10)
+    {
+        int win = glutGetWindow();
+        glutDestroyWindow(win);
+        return;
+    }
+
     //Display to screen
 
     glutPostRedisplay();
@@ -633,21 +644,22 @@ void keys(unsigned char key, int x, int y)
     }
     if ((int)key == 27)
     {
-        if (what_to_do == 0)
+        if (what_to_do == 4)
         {
-            what_to_do = -1;
+            what_to_do = 4;
+        }
+        else if (what_to_do == 0 || what_to_do == -1)
+        {
+            temp_what_to_do = what_to_do;
+            what_to_do = 4;
         }
         else if (what_to_do == 5 || what_to_do == 6)
         {
             what_to_do = 0;
         }
-        else if (what_to_do == 7)
-        {
-            what_to_do = 5;
-        }
         else
         {
-            what_to_do = 4;
+            what_to_do = 5;
         }
     }
     if (key == 'b' && what_to_do != -1)
@@ -664,6 +676,14 @@ void keys(unsigned char key, int x, int y)
     if (key == 'c' && what_to_do == 0)
     {
         what_to_do = 9;
+    }
+    if (key == 'y' && what_to_do == 4)
+    {
+        what_to_do = 10;
+    }
+    if (key == 'n' && what_to_do == 4)
+    {
+        what_to_do = temp_what_to_do;
     }
     display();
 }
