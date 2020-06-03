@@ -1,7 +1,5 @@
 #include<GL/glut.h>
 #include<stdio.h>
-#include<string.h>
-#include<time.h>
 //Declaring global variables
 
 int what_to_do = -1;
@@ -43,11 +41,15 @@ void draw_line(int x1, int y1, int x2, int y2)
     glEnd();
 }
 
-void delay(unsigned int mseconds)
+void draw_line_loop(int x, int y, int width, int height, float r = 1.0, float g = 0.0, float b = 0.0)
 {
-    clock_t goal = mseconds + clock();
-    while (goal > clock())
-        ;
+    glColor3f(r, g, b);
+    glBegin(GL_LINE_LOOP);
+        glVertex2f(x, y);
+        glVertex2f(x+width, y);
+        glVertex2f(x+width, y+height);
+        glVertex2f(x, y+height);
+    glEnd();
 }
 
 //Render bitmap characters
@@ -120,7 +122,7 @@ void intro(int x, int y)
 void display_blocks()
 {
     RenderString(400, 900, "Viewing Instance of block chain", GLUT_BITMAP_TIMES_ROMAN_24);
-    RenderString(400, 950, "Intro / Blockchain ", GLUT_BITMAP_HELVETICA_18);
+    RenderString(400, 950, "Intro / Block chain ", GLUT_BITMAP_HELVETICA_18);
     RenderString(400, 850, "Right click to view the Menu", GLUT_BITMAP_9_BY_15);
     int tempx = 0;
     char str[3];
@@ -215,7 +217,7 @@ void display_open_transactions()
         {
             to_string_digits(str, i);
         }
-        draw_polygon(tempx, oty, open_transaction_width, open_transaction_height);
+        draw_line_loop(tempx, oty, open_transaction_width, open_transaction_height, 1, 1, 1);
         RenderString(tempx, oty + (open_transaction_height/2), "Transaction", open_transaction_font);
         RenderString(tempx + open_transaction_width - 10, oty + (open_transaction_height/2), str ,open_transaction_font);
         tempx = tempx + open_transaction_width + padding;
@@ -262,7 +264,7 @@ void display_block_transactions()
         {
             to_string_digits(str, i);
         }
-        draw_polygon(tempx, oty, open_transaction_width, open_transaction_height);
+        draw_line_loop(tempx, oty, open_transaction_width, open_transaction_height, 1, 1, 1);
         RenderString(tempx, oty + (open_transaction_height/2), "Transaction", open_transaction_font);
         RenderString(tempx + open_transaction_width - 10, oty + (open_transaction_height/2), str ,open_transaction_font);
         tempx = tempx + open_transaction_width + padding;
@@ -345,7 +347,14 @@ void display_block()
     }
     RenderString(x1 + 25, y1 + 200, "Transactions: ", GLUT_BITMAP_TIMES_ROMAN_24);
     RenderString(x1 + 125, y1 + 200, t, GLUT_BITMAP_TIMES_ROMAN_24);
-    RenderString(x1, y1 - 50, "Press M to manipulate the block", GLUT_BITMAP_8_BY_13);
+    if (clicked_block >= manip_block && manip_block != -2)
+    {
+        RenderString(x1, y1 - 50, "Block seems to be invalid", GLUT_BITMAP_8_BY_13, 1, 0, 0);
+    }
+    else
+    {
+        RenderString(x1, y1 - 50, "Press M to manipulate the block", GLUT_BITMAP_8_BY_13);
+    }
     RenderString(400, 150, "A SIMULATOR BY", GLUT_BITMAP_9_BY_15);
     RenderString(400, 100, "ARUN R SHENOY 1BY17CS032", GLUT_BITMAP_9_BY_15);
     RenderString(400, 50, "CHARAN KALSHETTY 1BY17CS041", GLUT_BITMAP_9_BY_15);
@@ -360,7 +369,7 @@ void display_open_transaction()
     int x1 = 350;
     int y1 = 500;
     char ot[3];
-    draw_polygon(x1, y1, 300, 300);
+    draw_line_loop(x1, y1, 300, 300, 0, 1, 0);
 
     if (what_to_do == 7)
     {
@@ -439,6 +448,13 @@ void display()
         if (manip_block != -2)
         {
             what_to_do = 0;
+            printf("\a");
+            return;
+        }
+        if (no_of_blocks == 14)
+        {
+            what_to_do = 0;
+            printf("\a");
             return;
         }
         add_block();
@@ -449,6 +465,12 @@ void display()
 
     if (what_to_do == 2)
     {
+        if (no_of_ot == 14)
+        {
+            what_to_do = 0;
+            printf("\a");
+            return;
+        }
         x = x + open_transaction_width + padding;
         no_of_ot += 1;
         what_to_do = 0;
@@ -535,6 +557,7 @@ void display()
         if (manip_block == clicked_block || manip_block + 1 == clicked_block)
         {
             what_to_do = 5;
+            printf("\a");
             return;
         }
         manip_block = clicked_block;
@@ -589,7 +612,7 @@ void keys(unsigned char key, int x, int y)
     {
         what_to_do = 0;
     }
-    if (key == 'm' && what_to_do == 0)
+    if (key == 'm')
     {
         if (what_to_do == 5)
         {
